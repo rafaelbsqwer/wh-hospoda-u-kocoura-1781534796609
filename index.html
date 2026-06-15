@@ -1,0 +1,1521 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Tradiční česká hospoda s točeným pivem z tanku a domácí kuchyní.">
+  <meta name="template-id" content="food-hospoda">
+  <title>Hospoda U Kocoura — Praha Vinohrady</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600;1,700&display=swap" rel="stylesheet">
+  <style>
+    /* ── RESET ───────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --c0:      #0f0a05;
+      --c1:      #1c1008;
+      --c2:      #2d1a0a;
+      --amber:   #c17f24;
+      --amber-lt:#e8c97a;
+      --beige:   #f5ede0;
+      --cream:   #fff9f0;
+      --body:    #5c4033;
+      --serif:   'Playfair Display', Georgia, serif;
+      --sans:    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+
+    html { overflow-x: hidden; }
+
+    body {
+      background: var(--c1);
+      color: var(--cream);
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.9;
+      overflow-x: hidden;
+    }
+
+    /* ── GRAIN TEXTURE ───────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 9997;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+    }
+
+    /* ── LOADER ──────────────────────────────────────────────── */
+    #loader {
+      position: fixed;
+      inset: 0;
+      background: var(--c1);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.8rem;
+      transition: opacity .9s ease, visibility .9s ease;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .loader-name {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      color: var(--cream);
+      letter-spacing: .06em;
+    }
+    .loader-rule { width: 44px; height: 1px; background: var(--amber); opacity: .45; }
+    .loader-bar-wrap {
+      width: 240px; height: 2px;
+      background: rgba(193,127,36,.14);
+      overflow: hidden;
+    }
+    .loader-bar {
+      height: 100%; width: 0;
+      background: var(--amber);
+      animation: ldProg 3.5s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    @keyframes ldProg {
+      0%  { width: 0; }
+      60% { width: 78%; }
+      85% { width: 91%; }
+      100%{ width: 100%; }
+    }
+    .loader-label {
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .22em;
+      color: rgba(193,127,36,.6);
+    }
+
+    /* ── NAV ─────────────────────────────────────────────────── */
+    #nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 1.8rem 4rem;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background .4s, padding .4s;
+    }
+    #nav.scrolled {
+      background: rgba(28,16,8,.93);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 1rem 4rem;
+      border-bottom: 1px solid rgba(193,127,36,.1);
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.48rem;
+      color: var(--cream);
+      text-decoration: none;
+      letter-spacing: .04em;
+    }
+    .nav-links {
+      display: flex; align-items: center; gap: 2.5rem;
+      list-style: none;
+    }
+    .nav-links a {
+      color: rgba(255,249,240,.7);
+      text-decoration: none;
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      transition: color .3s;
+    }
+    .nav-links a:hover { color: var(--amber); }
+    .nav-cta {
+      background: var(--amber) !important;
+      color: var(--c0) !important;
+      padding: .5rem 1.5rem;
+      font-weight: 700;
+    }
+    .nav-cta:hover { background: var(--amber-lt) !important; }
+
+    .hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      cursor: pointer; padding: .4rem; z-index: 101;
+    }
+    .hamburger span {
+      display: block; width: 26px; height: 1px;
+      background: var(--cream); transition: all .3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .mob-menu {
+      position: fixed; inset: 0;
+      background: var(--c0);
+      z-index: 99;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2.6rem;
+      opacity: 0; visibility: hidden;
+      transition: opacity .4s, visibility .4s;
+    }
+    .mob-menu.open { opacity: 1; visibility: visible; }
+    .mob-menu a {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 2.5rem;
+      color: var(--cream);
+      text-decoration: none;
+      transition: color .3s;
+    }
+    .mob-menu a:hover { color: var(--amber); }
+    .mob-divider { width: 36px; height: 1px; background: rgba(193,127,36,.25); }
+
+    /* ── HERO ────────────────────────────────────────────────── */
+    #hero {
+      position: relative;
+      height: 100vh; min-height: 620px;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #hero-video {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom,
+        rgba(15,10,5,.2) 0%,
+        rgba(15,10,5,.5) 50%,
+        rgba(15,10,5,.88) 100%);
+      z-index: 1;
+    }
+
+    .hero-vprogress {
+      position: fixed; top: 0; left: 0;
+      height: 2px; width: 0;
+      background: var(--amber);
+      z-index: 200;
+      pointer-events: none;
+      transition: width .08s linear;
+    }
+
+    .hero-content {
+      position: relative; z-index: 10;
+      text-align: center;
+      max-width: 880px;
+      padding: 0 2rem;
+    }
+    .hero-tag {
+      display: block;
+      font-size: .66rem;
+      text-transform: uppercase;
+      letter-spacing: .34em;
+      color: var(--amber);
+      margin-bottom: 1.6rem;
+      opacity: 0;
+    }
+    .hero-title {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(3rem, 7.5vw, 5.6rem);
+      color: var(--cream);
+      line-height: 1.06;
+      margin-bottom: 1.8rem;
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    .hero-rule {
+      width: 80px; height: 1px;
+      background: var(--amber);
+      margin: 0 auto 1.8rem;
+      opacity: 0;
+      transform: scaleX(0);
+      transform-origin: left;
+    }
+    .hero-sub {
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .25em;
+      color: rgba(255,249,240,.7);
+      margin-bottom: 3rem;
+      opacity: 0;
+    }
+    .hero-btns {
+      display: flex; gap: 1.4rem;
+      justify-content: center; flex-wrap: wrap;
+      opacity: 0; transform: translateY(22px);
+    }
+
+    .btn {
+      display: inline-block;
+      font-size: .66rem;
+      text-transform: uppercase;
+      letter-spacing: .22em;
+      text-decoration: none;
+      padding: .92rem 2.5rem;
+      transition: all .3s;
+      cursor: pointer;
+      border: none;
+      font-family: var(--sans);
+      font-weight: 500;
+    }
+    .btn-amber { background: var(--amber); color: var(--c0); font-weight: 700; }
+    .btn-amber:hover { background: var(--amber-lt); }
+    .btn-ghost { background: transparent; color: var(--cream); border: 1px solid rgba(255,249,240,.32); }
+    .btn-ghost:hover { border-color: var(--amber); color: var(--amber); }
+
+    .hero-vert-left {
+      position: absolute; left: 2rem; top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      font-size: .58rem;
+      text-transform: uppercase;
+      letter-spacing: .36em;
+      color: rgba(193,127,36,.38);
+      white-space: nowrap;
+      z-index: 10;
+      opacity: 0;
+    }
+
+    .hero-scroll {
+      position: absolute; right: 2rem; bottom: 2.6rem;
+      display: flex; flex-direction: column;
+      align-items: center; gap: .8rem;
+      z-index: 10; opacity: 0;
+    }
+    .hero-scroll-label {
+      font-size: .56rem;
+      text-transform: uppercase;
+      letter-spacing: .28em;
+      color: rgba(255,249,240,.38);
+      writing-mode: vertical-lr;
+      transform: rotate(180deg);
+    }
+    .hero-scroll-line {
+      width: 1px; height: 52px;
+      background: linear-gradient(to bottom, rgba(193,127,36,.65), transparent);
+      animation: lineFlow 2.2s ease-in-out infinite;
+    }
+    @keyframes lineFlow {
+      0%   { transform: scaleY(0); transform-origin: top; }
+      49%  { transform: scaleY(1); transform-origin: top; }
+      50%  { transform: scaleY(1); transform-origin: bottom; }
+      100% { transform: scaleY(0); transform-origin: bottom; }
+    }
+
+    /* ── SHARED SECTION ──────────────────────────────────────── */
+    section { position: relative; }
+
+    .sec-num {
+      position: absolute; top: 1.8rem; right: 2.5rem;
+      font-family: var(--serif);
+      font-size: clamp(5rem, 13vw, 10rem);
+      font-weight: 900;
+      color: transparent;
+      line-height: 1;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .sec-tag {
+      display: block;
+      font-size: .62rem;
+      text-transform: uppercase;
+      letter-spacing: .28em;
+      color: var(--amber);
+      margin-bottom: 1.2rem;
+    }
+    .sec-title {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(2rem, 3.8vw, 3.3rem);
+      line-height: 1.18;
+      margin-bottom: 1.6rem;
+    }
+    .gold-rule {
+      width: 60px; height: 1px;
+      background: var(--amber);
+      margin-bottom: 2.2rem;
+    }
+    .gold-rule-c {
+      width: 60px; height: 1px;
+      background: var(--amber);
+      margin: 0 auto 2.2rem;
+    }
+
+    /* hop concentric motif */
+    .hop-decor {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      border: 1px solid rgba(193,127,36,.07);
+    }
+    .hop-decor::before {
+      content: '';
+      position: absolute;
+      inset: 22px;
+      border-radius: 50%;
+      border: 1px solid rgba(193,127,36,.05);
+    }
+    .hop-decor::after {
+      content: '';
+      position: absolute;
+      inset: 44px;
+      border-radius: 50%;
+      border: 1px solid rgba(193,127,36,.04);
+    }
+
+    /* vertical edge text */
+    .vert-edge {
+      position: absolute;
+      top: 50%;
+      font-size: .56rem;
+      text-transform: uppercase;
+      letter-spacing: .38em;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+    }
+    .vert-edge-l { left: 1.2rem; transform: translateY(-50%) rotate(-90deg); }
+    .vert-edge-r { right: -2rem; transform: translateY(-50%) rotate(90deg); }
+
+    /* ── SECTION 01 — PŘÍBĚH ─────────────────────────────────── */
+    #about {
+      background: var(--cream);
+      color: var(--c0);
+      overflow: hidden;
+    }
+    #about .sec-num { -webkit-text-stroke: 1px rgba(15,10,5,.055); }
+    #about .vert-edge { color: rgba(92,64,51,.12); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 47% 53%;
+      min-height: 680px;
+    }
+    .about-img { position: relative; overflow: hidden; }
+    .about-img::after {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--amber);
+    }
+    .about-img img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transform: scale(1.06);
+    }
+    .about-body { padding: 8rem 5rem 5rem 4.5rem; }
+    .about-body .sec-title { color: var(--c0); }
+    .about-text {
+      color: var(--body);
+      line-height: 1.9;
+      font-size: .96rem;
+      margin-bottom: 1.4rem;
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: .5rem;
+      margin: 2.8rem 0 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(15,10,5,.09);
+    }
+    .stat { text-align: center; }
+    .stat-n {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 2.3rem;
+      color: var(--amber);
+      display: block;
+      line-height: 1;
+      margin-bottom: .5rem;
+    }
+    .stat-l {
+      font-size: .58rem;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: rgba(15,10,5,.42);
+    }
+
+    /* ── SECTION 02 — NABÍDKA ────────────────────────────────── */
+    #menu {
+      background: var(--c1);
+      padding: 8rem 4rem;
+      overflow: hidden;
+    }
+    #menu .sec-num { -webkit-text-stroke: 1px rgba(193,127,36,.07); }
+
+    .menu-head {
+      text-align: center;
+      margin-bottom: 3.5rem;
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .menu-head .sec-title { color: var(--cream); }
+
+    .menu-tabs {
+      display: flex; justify-content: center; gap: 3rem;
+      border-bottom: 1px solid rgba(193,127,36,.13);
+      margin-bottom: 3rem;
+    }
+    .m-tab {
+      font-size: .66rem;
+      text-transform: uppercase;
+      letter-spacing: .22em;
+      color: rgba(255,249,240,.36);
+      cursor: pointer;
+      padding-bottom: 1.1rem;
+      margin-bottom: -1px;
+      border-bottom: 1px solid transparent;
+      transition: color .3s, border-color .3s;
+      background: none;
+      border-top: none; border-left: none; border-right: none;
+      font-family: var(--sans);
+    }
+    .m-tab.active { color: var(--amber); border-bottom-color: var(--amber); }
+    .m-tab:hover { color: var(--amber-lt); }
+
+    .m-panel { display: none; max-width: 720px; margin: 0 auto; }
+    .m-panel.active { display: block; }
+    .m-panel-desc {
+      text-align: center;
+      font-style: italic;
+      color: rgba(255,249,240,.4);
+      font-size: .88rem;
+      margin-bottom: 2.4rem;
+    }
+    .m-item {
+      display: flex; align-items: baseline; gap: .4rem;
+      padding: .9rem 0;
+      border-bottom: 1px solid rgba(193,127,36,.08);
+      transition: color .3s;
+    }
+    .m-item:hover { color: var(--amber); }
+    .m-item:hover .m-price { color: var(--amber-lt); }
+    .m-name { flex: 0 0 auto; font-size: .93rem; }
+    .m-dots {
+      flex: 1;
+      border-bottom: 1px dotted rgba(193,127,36,.28);
+      margin-bottom: 4px;
+      min-width: 20px;
+    }
+    .m-price {
+      flex: 0 0 auto;
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--amber);
+      font-size: .96rem;
+      transition: color .3s;
+    }
+
+    .menu-marquee-wrap {
+      max-width: 720px;
+      margin: 3.5rem auto 0;
+      overflow: hidden;
+      border: 1px solid rgba(193,127,36,.15);
+      padding: 1.3rem 0;
+    }
+    .menu-mq { display: flex; white-space: nowrap; will-change: transform; }
+    .menu-mq-item {
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      color: rgba(193,127,36,.62);
+      padding-right: 2.5rem;
+      flex-shrink: 0;
+    }
+
+    /* ── SECTION 03 — GALERIE ────────────────────────────────── */
+    #gallery { overflow: hidden; }
+
+    .gallery-label {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      font-family: var(--serif);
+      font-size: clamp(4rem, 9.5vw, 8.5rem);
+      font-weight: 900;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(193,127,36,.11);
+      letter-spacing: .2em;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 2;
+      text-transform: uppercase;
+    }
+    .gallery-grid { display: grid; grid-template-columns: repeat(3,1fr); }
+    .g-item { position: relative; height: 480px; overflow: hidden; }
+    .g-item img {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: transform .7s ease;
+    }
+    .g-item:hover img { transform: scale(1.05); }
+    .g-overlay {
+      position: absolute; inset: 0;
+      background: rgba(193,127,36,0);
+      transition: background .4s;
+      z-index: 1;
+    }
+    .g-item:hover .g-overlay { background: rgba(193,127,36,.28); }
+
+    /* ── SECTION 04 — PROČ MY ────────────────────────────────── */
+    #why {
+      background: var(--c1);
+      padding: 8rem 4rem 0;
+      overflow: hidden;
+    }
+    #why .sec-num { -webkit-text-stroke: 1px rgba(193,127,36,.07); }
+
+    .why-head { text-align: center; margin-bottom: 5rem; }
+    .why-head .sec-title { color: var(--cream); }
+
+    .why-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .why-card {
+      padding: 2.5rem 2rem;
+      border-left: 1px solid rgba(193,127,36,.12);
+    }
+    .why-num {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 3.6rem;
+      color: var(--amber);
+      opacity: .55;
+      line-height: 1;
+      margin-bottom: 1.2rem;
+      display: block;
+    }
+    .why-rule { width: 40px; height: 1px; background: var(--amber); margin-bottom: 1.4rem; }
+    .why-card-title {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: 1.38rem;
+      color: var(--cream);
+      margin-bottom: .9rem;
+    }
+    .why-card-body { font-size: .84rem; color: rgba(255,249,240,.46); line-height: 1.85; }
+
+    .marquee-wrap {
+      overflow: hidden;
+      border-top: 1px solid rgba(193,127,36,.13);
+      border-bottom: 1px solid rgba(193,127,36,.13);
+      padding: 1.6rem 0;
+      margin-top: 5rem;
+    }
+    .marquee-track { display: flex; white-space: nowrap; will-change: transform; }
+    .marquee-item {
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .34em;
+      color: rgba(193,127,36,.44);
+      padding-right: 2.8rem;
+      flex-shrink: 0;
+    }
+
+    /* ── SECTION 05 — REFERENCE ──────────────────────────────── */
+    #testimonials {
+      background: var(--beige);
+      padding: 8rem 4rem;
+      overflow: hidden;
+    }
+    #testimonials .sec-num { -webkit-text-stroke: 1px rgba(15,10,5,.055); }
+    #testimonials .vert-edge { color: rgba(92,64,51,.1); }
+
+    .testi-head { text-align: center; margin-bottom: 4.5rem; }
+    .testi-head .sec-title { color: var(--c0); }
+
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3,1fr);
+      gap: 2rem;
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+    .testi-card {
+      background: var(--cream);
+      padding: 3rem 2.5rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .testi-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--amber);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .45s ease;
+    }
+    .testi-card:hover::after { transform: scaleX(1); }
+    .quote-glyph {
+      display: block;
+      font-family: var(--serif);
+      font-size: 4.5rem;
+      color: var(--amber);
+      line-height: .55;
+      margin-bottom: 1.8rem;
+      opacity: .5;
+    }
+    .testi-text {
+      font-style: italic;
+      color: var(--body);
+      line-height: 1.9;
+      font-size: .93rem;
+      margin-bottom: 2rem;
+    }
+    .testi-author {
+      font-size: .63rem;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: var(--c0);
+      margin-bottom: .45rem;
+      font-weight: 600;
+    }
+    .testi-stars { color: var(--amber); font-size: .78rem; letter-spacing: .1em; }
+
+    /* ── SECTION 06 — OTEVÍRACÍ DOBY ────────────────────────── */
+    #hours {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 560px;
+    }
+    .hours-left {
+      background: var(--c1);
+      padding: 6rem 5rem;
+    }
+    .hours-left .sec-title { color: var(--cream); }
+
+    .h-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      border-bottom: 1px solid rgba(255,249,240,.07);
+    }
+    .h-day {
+      font-size: .63rem;
+      text-transform: uppercase;
+      letter-spacing: .15em;
+      color: rgba(255,249,240,.44);
+    }
+    .h-time {
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--amber);
+      font-size: .96rem;
+    }
+    .h-note {
+      margin-top: 1.8rem;
+      font-size: .64rem;
+      color: rgba(255,249,240,.26);
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    .hours-right {
+      position: relative; overflow: hidden;
+      background-image: url('https://raw.githubusercontent.com/rafaelbsqwer/webhunter-assets/main/food-hospoda/foto2.jpeg');
+      background-size: cover;
+      background-position: center;
+    }
+    .hours-right-overlay {
+      position: absolute; inset: 0;
+      background: rgba(15,10,5,.66);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2rem; text-align: center;
+      padding: 3rem;
+    }
+    .hours-cta-title {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.6rem, 3vw, 2.6rem);
+      color: var(--cream);
+      line-height: 1.25;
+    }
+
+    /* ── SECTION 07 — KONTAKT ────────────────────────────────── */
+    #contact {
+      background: var(--c0);
+      padding: 8rem 4rem;
+      overflow: hidden;
+    }
+    #contact .sec-num { -webkit-text-stroke: 1px rgba(193,127,36,.06); }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .contact-info .sec-title { color: var(--cream); }
+
+    .c-row {
+      display: flex; align-items: flex-start;
+      gap: 1rem;
+      padding: 1.1rem 0;
+      border-bottom: 1px solid rgba(193,127,36,.09);
+    }
+    .c-icon { font-size: 1rem; line-height: 1.6; flex-shrink: 0; }
+    .c-val { font-size: .9rem; color: rgba(255,249,240,.68); line-height: 1.6; }
+
+    .form-title {
+      font-family: var(--serif);
+      font-style: italic;
+      font-size: clamp(1.6rem, 2.8vw, 2.3rem);
+      color: var(--cream);
+      margin-bottom: 2.2rem;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0 2rem;
+    }
+    .form-group { margin-bottom: 1.8rem; }
+    .form-group label {
+      display: block;
+      font-size: .58rem;
+      text-transform: uppercase;
+      letter-spacing: .2em;
+      color: rgba(193,127,36,.68);
+      margin-bottom: .6rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(193,127,36,.38);
+      padding: .6rem 0;
+      color: var(--cream);
+      font-family: var(--sans);
+      font-size: .92rem;
+      outline: none;
+      transition: border-color .3s;
+      -webkit-appearance: none;
+      border-radius: 0;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-bottom-color: var(--amber); }
+    .form-group textarea { resize: vertical; min-height: 80px; }
+    .form-group input::placeholder,
+    .form-group textarea::placeholder { color: rgba(255,249,240,.22); }
+    .form-group select option { background: var(--c0); color: var(--cream); }
+    .btn-full { width: 100%; text-align: center; display: block; }
+
+    /* ── FOOTER ──────────────────────────────────────────────── */
+    footer {
+      background: var(--c0);
+      border-top: 1px solid rgba(193,127,36,.16);
+      padding: 2.4rem 4rem;
+      text-align: center;
+    }
+    .footer-text {
+      font-size: .6rem;
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      color: rgba(255,249,240,.26);
+    }
+
+    /* ── STICKY PHONE ────────────────────────────────────────── */
+    .sticky-phone {
+      display: none;
+      position: fixed;
+      bottom: 1.5rem; right: 1.5rem;
+      z-index: 90;
+      background: var(--amber);
+      color: var(--c0);
+      padding: .8rem 1.3rem;
+      font-size: .76rem;
+      font-weight: 700;
+      text-decoration: none;
+      letter-spacing: .06em;
+      box-shadow: 0 4px 20px rgba(193,127,36,.4);
+      transition: background .3s;
+    }
+    .sticky-phone:hover { background: var(--amber-lt); }
+
+    /* ── RESPONSIVE ──────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      #nav, #nav.scrolled { padding-left: 2rem; padding-right: 2rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .about-img { height: 380px; }
+      .about-body { padding: 4rem 2.5rem; }
+      .why-grid { grid-template-columns: 1fr 1fr; }
+      .contact-grid { grid-template-columns: 1fr; gap: 4rem; }
+      #hours { grid-template-columns: 1fr; }
+      .hours-right { min-height: 340px; }
+    }
+
+    @media (max-width: 768px) {
+      #nav, #nav.scrolled { padding: 1rem 1.5rem; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+      .sticky-phone { display: block; }
+      .hero-vert-left { display: none; }
+
+      .about-img { height: 310px; }
+      .about-body { padding: 3rem 1.5rem; }
+
+      #menu { padding: 5rem 1.5rem; }
+      .menu-tabs { gap: 1.5rem; }
+
+      .gallery-grid { grid-template-columns: 1fr; }
+      .g-item { height: 300px; }
+      .gallery-label { display: none; }
+
+      .why-grid { grid-template-columns: 1fr; }
+      #why { padding: 5rem 1.5rem 0; }
+
+      .testi-grid { grid-template-columns: 1fr; }
+      #testimonials { padding: 5rem 1.5rem; }
+
+      .hours-left { padding: 4rem 1.5rem; }
+      .hours-right { min-height: 300px; }
+
+      #contact { padding: 5rem 1.5rem; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .contact-grid { gap: 3rem; }
+
+      footer { padding: 2rem 1.5rem; }
+      .sec-num { font-size: 4.5rem; right: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── LOADER ───────────────────────────────────────────── -->
+  <div id="loader">
+    <div class="loader-name">Hospoda U Kocoura</div>
+    <div class="loader-rule"></div>
+    <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+    <div class="loader-label">Připravujeme váš návrh webu</div>
+  </div>
+
+  <!-- ── NAV ─────────────────────────────────────────────── -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">Hospoda U Kocoura</a>
+    <ul class="nav-links">
+      <li><a href="#about">O nás</a></li>
+      <li><a href="#menu">Nabídka</a></li>
+      <li><a href="#gallery">Galerie</a></li>
+      <li><a href="#contact">Kontakt</a></li>
+      <li><a href="#contact" class="nav-cta">Přijďte na pivo</a></li>
+    </ul>
+    <button class="hamburger" id="hamburger" aria-label="Otevřít menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ── MOB MENU ─────────────────────────────────────────── -->
+  <div class="mob-menu" id="mobMenu">
+    <a href="#about"   class="mob-link">O nás</a>
+    <div class="mob-divider"></div>
+    <a href="#menu"    class="mob-link">Nabídka</a>
+    <div class="mob-divider"></div>
+    <a href="#gallery" class="mob-link">Galerie</a>
+    <div class="mob-divider"></div>
+    <a href="#contact" class="mob-link">Kontakt</a>
+    <div class="mob-divider"></div>
+    <a href="#contact" class="mob-link" style="color:var(--amber)">Přijďte na pivo</a>
+  </div>
+
+  <!-- ── HERO ─────────────────────────────────────────────── -->
+  <div class="hero-vprogress" id="heroVP"></div>
+
+  <section id="hero">
+    <video id="hero-video" muted playsinline preload="auto">
+      <source src="https://raw.githubusercontent.com/rafaelbsqwer/webhunter-assets/main/food-hospoda/video1.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+
+    <span class="hero-vert-left">Tradiční česká hospoda</span>
+
+    <div class="hero-content">
+      <span class="hero-tag">— Tradiční česká hospoda —</span>
+      <h1 class="hero-title">Pravá česká hospoda s tradicí</h1>
+      <div class="hero-rule"></div>
+      <p class="hero-sub">Točené pivo a domácí kuchyně na Vinohradech</p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn btn-amber">Přijďte na pivo</a>
+        <a href="#menu"    class="btn btn-ghost">Naše menu</a>
+      </div>
+    </div>
+
+    <div class="hero-scroll">
+      <span class="hero-scroll-label">Scroll</span>
+      <div class="hero-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ── 01 PŘÍBĚH ─────────────────────────────────────────── -->
+  <section id="about">
+    <span class="sec-num">01</span>
+    <span class="vert-edge vert-edge-l">Náš příběh</span>
+    <div class="hop-decor" style="width:200px;height:200px;right:3rem;bottom:5rem;"></div>
+
+    <div class="about-grid">
+      <div class="about-img">
+        <img src="https://raw.githubusercontent.com/rafaelbsqwer/webhunter-assets/main/food-hospoda/foto1.jpeg"
+             alt="Hospoda U Kocoura">
+      </div>
+      <div class="about-body">
+        <span class="sec-tag">— Náš příběh —</span>
+        <h2 class="sec-title">O hospodě Hospoda U Kocoura</h2>
+        <div class="gold-rule"></div>
+        <p class="about-text">Hospoda U Kocoura je tradiční česká hospoda v srdci Vinohrad. Čepujeme Kozel a Pilsner Urquell a vaříme poctivá česká jídla.</p>
+        <div class="about-stats">
+          <div class="stat">
+            <span class="stat-n">25+</span>
+            <span class="stat-l">let tradice</span>
+          </div>
+          <div class="stat">
+            <span class="stat-n">8</span>
+            <span class="stat-l">druhů točeného</span>
+          </div>
+          <div class="stat">
+            <span class="stat-n">120</span>
+            <span class="stat-l">míst k sezení</span>
+          </div>
+        </div>
+        <a href="#contact" class="btn btn-amber">Přijďte na pivo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 02 NABÍDKA ────────────────────────────────────────── -->
+  <section id="menu">
+    <span class="sec-num">02</span>
+    <span class="vert-edge vert-edge-r" style="color:rgba(193,127,36,.07);">Lístek</span>
+
+    <div class="menu-head">
+      <span class="sec-tag">— Lístek —</span>
+      <h2 class="sec-title">Jídelní &amp; nápojový lístek</h2>
+      <div class="gold-rule-c"></div>
+    </div>
+
+    <div class="menu-tabs" id="menuTabs">
+      <button class="m-tab active" data-tab="tab1">Točené pivo</button>
+      <button class="m-tab"        data-tab="tab2">Hospodská jídla</button>
+      <button class="m-tab"        data-tab="tab3">Týdenní akce</button>
+    </div>
+
+    <div class="m-panel active" id="tab1">
+      <p class="m-panel-desc">Kozel a Pilsner Urquell vždy čerstvé.</p>
+      <div class="m-item"><span class="m-name">{{M1_1}}</span><span class="m-dots"></span><span class="m-price">{{M1_1_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M1_2}}</span><span class="m-dots"></span><span class="m-price">{{M1_2_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M1_3}}</span><span class="m-dots"></span><span class="m-price">{{M1_3_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M1_4}}</span><span class="m-dots"></span><span class="m-price">{{M1_4_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M1_5}}</span><span class="m-dots"></span><span class="m-price">{{M1_5_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M1_6}}</span><span class="m-dots"></span><span class="m-price">{{M1_6_P}}</span></div>
+    </div>
+    <div class="m-panel" id="tab2">
+      <p class="m-panel-desc">Svíčková, guláš a smažený řízek.</p>
+      <div class="m-item"><span class="m-name">{{M2_1}}</span><span class="m-dots"></span><span class="m-price">{{M2_1_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M2_2}}</span><span class="m-dots"></span><span class="m-price">{{M2_2_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M2_3}}</span><span class="m-dots"></span><span class="m-price">{{M2_3_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M2_4}}</span><span class="m-dots"></span><span class="m-price">{{M2_4_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M2_5}}</span><span class="m-dots"></span><span class="m-price">{{M2_5_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M2_6}}</span><span class="m-dots"></span><span class="m-price">{{M2_6_P}}</span></div>
+    </div>
+    <div class="m-panel" id="tab3">
+      <p class="m-panel-desc">Denní menu a každý pátek živá muzika.</p>
+      <div class="m-item"><span class="m-name">{{M3_1}}</span><span class="m-dots"></span><span class="m-price">{{M3_1_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M3_2}}</span><span class="m-dots"></span><span class="m-price">{{M3_2_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M3_3}}</span><span class="m-dots"></span><span class="m-price">{{M3_3_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M3_4}}</span><span class="m-dots"></span><span class="m-price">{{M3_4_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M3_5}}</span><span class="m-dots"></span><span class="m-price">{{M3_5_P}}</span></div>
+      <div class="m-item"><span class="m-name">{{M3_6}}</span><span class="m-dots"></span><span class="m-price">{{M3_6_P}}</span></div>
+    </div>
+
+    <div class="menu-marquee-wrap">
+      <div class="menu-mq" id="menuMq">
+        <span class="menu-mq-item">Točíme Kozel · Pilsner Urquell · Bernard · a domácí speciály &nbsp;·&nbsp; </span>
+        <span class="menu-mq-item">Točíme Kozel · Pilsner Urquell · Bernard · a domácí speciály &nbsp;·&nbsp; </span>
+        <span class="menu-mq-item">Točíme Kozel · Pilsner Urquell · Bernard · a domácí speciály &nbsp;·&nbsp; </span>
+        <span class="menu-mq-item">Točíme Kozel · Pilsner Urquell · Bernard · a domácí speciály &nbsp;·&nbsp; </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 03 GALERIE ─────────────────────────────────────────── -->
+  <section id="gallery">
+    <div class="gallery-label">ATMOSFÉRA</div>
+    <div class="gallery-grid">
+      <div class="g-item">
+        <img src="https://raw.githubusercontent.com/rafaelbsqwer/webhunter-assets/main/food-hospoda/foto1.jpeg" alt="Hospoda atmosféra">
+        <div class="g-overlay"></div>
+      </div>
+      <div class="g-item">
+        <img src="https://raw.githubusercontent.com/rafaelbsqwer/webhunter-assets/main/food-hospoda/foto2.jpeg" alt="Hospoda interiér">
+        <div class="g-overlay"></div>
+      </div>
+      <div class="g-item">
+        <img src="https://raw.githubusercontent.com/rafaelbsqwer/webhunter-assets/main/food-hospoda/foto3.jpeg" alt="Hospoda kuchyně">
+        <div class="g-overlay"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 04 PROČ MY ─────────────────────────────────────────── -->
+  <section id="why">
+    <span class="sec-num">04</span>
+    <div class="hop-decor" style="width:220px;height:220px;left:3rem;top:8rem;"></div>
+
+    <div class="why-head">
+      <span class="sec-tag">— Proč k nám —</span>
+      <h2 class="sec-title" style="color:var(--cream)">Co nás odlišuje</h2>
+      <div class="gold-rule-c"></div>
+    </div>
+
+    <div class="why-grid">
+      <div class="why-card">
+        <span class="why-num">01</span>
+        <div class="why-rule"></div>
+        <h3 class="why-card-title">Točené z tanku</h3>
+        <p class="why-card-body">Čerstvé nefiltrovné pivo přímo z tanku.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-num">02</span>
+        <div class="why-rule"></div>
+        <h3 class="why-card-title">Domácí kuchyně</h3>
+        <p class="why-card-body">Svíčková a guláš každý den.</p>
+      </div>
+      <div class="why-card">
+        <span class="why-num">03</span>
+        <div class="why-rule"></div>
+        <h3 class="why-card-title">Přátelská atmosféra</h3>
+        <p class="why-card-body">Místo kde se cítíte jako doma.</p>
+      </div>
+    </div>
+
+    <div class="marquee-wrap">
+      <div class="marquee-track" id="mainMq">
+        <span class="marquee-item">TOČENÉ PIVO ·</span>
+        <span class="marquee-item">DOMÁCÍ KUCHYNĚ ·</span>
+        <span class="marquee-item">ČESKÁ TRADICE ·</span>
+        <span class="marquee-item">PŘÁTELSKÁ PARTA ·</span>
+        <span class="marquee-item">DOBRÁ NÁLADA ·</span>
+        <span class="marquee-item">TOČENÉ PIVO ·</span>
+        <span class="marquee-item">DOMÁCÍ KUCHYNĚ ·</span>
+        <span class="marquee-item">ČESKÁ TRADICE ·</span>
+        <span class="marquee-item">PŘÁTELSKÁ PARTA ·</span>
+        <span class="marquee-item">DOBRÁ NÁLADA ·</span>
+        <span class="marquee-item">TOČENÉ PIVO ·</span>
+        <span class="marquee-item">DOMÁCÍ KUCHYNĚ ·</span>
+        <span class="marquee-item">ČESKÁ TRADICE ·</span>
+        <span class="marquee-item">PŘÁTELSKÁ PARTA ·</span>
+        <span class="marquee-item">DOBRÁ NÁLADA ·</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 05 REFERENCE ───────────────────────────────────────── -->
+  <section id="testimonials">
+    <span class="sec-num">05</span>
+    <span class="vert-edge vert-edge-l">Hosté</span>
+
+    <div class="testi-head">
+      <span class="sec-tag">— Recenze —</span>
+      <h2 class="sec-title">Co říkají naši hosté</h2>
+      <div class="gold-rule-c"></div>
+    </div>
+
+    <div class="testi-grid">
+      <div class="testi-card">
+        <span class="quote-glyph">"</span>
+        <p class="testi-text">Nejlepší hospoda na Vinohradech.</p>
+        <div class="testi-author">— Karel B., Praha 3</div>
+        <div class="testi-stars">★★★★★</div>
+      </div>
+      <div class="testi-card">
+        <span class="quote-glyph">"</span>
+        <p class="testi-text">Pivo vždy čerstvé a obsluha usměvavá.</p>
+        <div class="testi-author">— Věra D., Praha 2</div>
+        <div class="testi-stars">★★★★★</div>
+      </div>
+      <div class="testi-card">
+        <span class="quote-glyph">"</span>
+        <p class="testi-text">Skvělé místo pro večer s přáteli.</p>
+        <div class="testi-author">— Michal P., Praha 3</div>
+        <div class="testi-stars">★★★★★</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 06 OTEVÍRACÍ DOBY ──────────────────────────────────── -->
+  <section id="hours" style="position:relative;">
+    <span class="sec-num" style="-webkit-text-stroke:1px rgba(193,127,36,.07);">06</span>
+    <div class="hours-left">
+      <span class="sec-tag">— Kdy nás najdete —</span>
+      <h2 class="sec-title">Otevírací doby</h2>
+      <div class="gold-rule"></div>
+      <div class="h-row">
+        <span class="h-day">Pondělí – Pátek</span>
+        <span class="h-time">11:00 – 23:00</span>
+      </div>
+      <div class="h-row">
+        <span class="h-day">Sobota</span>
+        <span class="h-time">12:00 – 24:00</span>
+      </div>
+      <div class="h-row">
+        <span class="h-day">Neděle</span>
+        <span class="h-time">12:00 – 22:00</span>
+      </div>
+      <p class="h-note">Kuchyně otevřena: Po – Ne · 11:00 – 21:30</p>
+    </div>
+    <div class="hours-right">
+      <div class="hours-right-overlay">
+        <h3 class="hours-cta-title">Zarezervujte si stůl</h3>
+        <a href="#contact" class="btn btn-amber">Přijďte na pivo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 07 KONTAKT ─────────────────────────────────────────── -->
+  <section id="contact">
+    <span class="sec-num">07</span>
+
+    <div class="contact-grid">
+      <div class="contact-info">
+        <span class="sec-tag">— Kde nás najdete —</span>
+        <h2 class="sec-title">Najdete nás</h2>
+        <div class="gold-rule"></div>
+        <div class="c-row">
+          <span class="c-icon">📍</span>
+          <span class="c-val"></span>
+        </div>
+        <div class="c-row">
+          <span class="c-icon">📞</span>
+          <span class="c-val">+420777111002</span>
+        </div>
+        <div class="c-row">
+          <span class="c-icon">✉️</span>
+          <span class="c-val">weboviny@email.cz</span>
+        </div>
+      </div>
+
+      <div class="contact-form">
+        <h3 class="form-title">Rezervace &amp; dotazy</h3>
+        <form onsubmit="return false;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Jméno</label>
+              <input type="text" placeholder="Vaše jméno">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" placeholder="vas@email.cz">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Telefon</label>
+              <input type="tel" placeholder="+420 ...">
+            </div>
+            <div class="form-group">
+              <label>Datum návštěvy</label>
+              <input type="date">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Počet osob</label>
+              <select>
+                <option value="">Vyberte</option>
+                <option>1 osoba</option>
+                <option>2 osoby</option>
+                <option>3–5 osob</option>
+                <option>6–10 osob</option>
+                <option>Více než 10</option>
+              </select>
+            </div>
+            <div class="form-group"></div>
+          </div>
+          <div class="form-group">
+            <label>Poznámka</label>
+            <textarea placeholder="Vaše přání, alergie, speciální požadavky…"></textarea>
+          </div>
+          <button type="submit" class="btn btn-amber btn-full">Rezervovat stůl</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────── -->
+  <footer>
+    <p class="footer-text">© 2026 Hospoda U Kocoura · </p>
+  </footer>
+
+  <!-- ── STICKY PHONE (mobil) ───────────────────────────────── -->
+  <a href="tel:+420777111002" class="sticky-phone">📞 +420777111002</a>
+
+  <!-- ── CDN ───────────────────────────────────────────────── -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ── helpers ─────────────────────────────────────────── */
+    const isMob = () => window.innerWidth <= 768;
+    const $  = (s) => document.querySelector(s);
+    const $$ = (s) => document.querySelectorAll(s);
+
+    /* ── LENIS + GSAP ────────────────────────────────────── */
+    const lenis = new Lenis({ lerp: 0.08, smoothWheel: true });
+    gsap.registerPlugin(ScrollTrigger);
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((t) => lenis.raf(t * 1000));
+    gsap.ticker.lagSmoothing(0);
+
+    /* ── LOADER ──────────────────────────────────────────── */
+    const loader  = $('#loader');
+    const heroVid = $('#hero-video');
+    let   done    = false;
+
+    document.body.style.overflow = 'hidden';
+
+    function hideLoader() {
+      if (done) return;
+      done = true;
+      loader.classList.add('hidden');
+      document.body.style.overflow = '';
+      setTimeout(revealHero, 150);
+    }
+
+    const autoHide = setTimeout(hideLoader, 4000);
+    heroVid.addEventListener('canplaythrough', () => {
+      clearTimeout(autoHide);
+      hideLoader();
+    }, { once: true });
+
+    /* ── HERO REVEAL ─────────────────────────────────────── */
+    function revealHero() {
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+      tl.to('.hero-tag',       { opacity: 1, duration: 0.9 })
+        .to('.hero-title',     { opacity: 1, y: 0, duration: 1 },        '-=0.5')
+        .to('.hero-rule',      { opacity: 1, scaleX: 1, duration: 0.8 }, '-=0.6')
+        .to('.hero-sub',       { opacity: 1, duration: 0.8 },            '-=0.5')
+        .to('.hero-btns',      { opacity: 1, y: 0, duration: 0.8 },      '-=0.5')
+        .to('.hero-vert-left', { opacity: 1, duration: 1 },              '-=0.8')
+        .to('.hero-scroll',    { opacity: 1, duration: 1 },              '-=0.8');
+    }
+
+    /* ── SCROLL-DRIVEN VIDEO ─────────────────────────────── */
+    const heroVP = $('#heroVP');
+    const trigH  = window.innerHeight;
+
+    if (!isMob()) {
+      heroVid.pause();
+      heroVid.currentTime = 0;
+
+      lenis.on('scroll', ({ scroll }) => {
+        if (heroVid.readyState < 2) return;
+        const p = Math.min(Math.max(scroll / trigH, 0), 1);
+        heroVid.currentTime = p * (heroVid.duration || 0);
+        heroVP.style.width   = (p * 100) + '%';
+        heroVP.style.opacity = p < 1 ? '1' : '0';
+      });
+    } else {
+      heroVid.setAttribute('autoplay', '');
+      heroVid.setAttribute('loop', '');
+      heroVid.play().catch(() => {});
+    }
+
+    /* ── NAV ─────────────────────────────────────────────── */
+    const nav = $('#nav');
+    lenis.on('scroll', ({ scroll }) => {
+      nav.classList.toggle('scrolled', scroll > 50);
+    });
+
+    /* ── HAMBURGER ───────────────────────────────────────── */
+    const hamburger = $('#hamburger');
+    const mobMenu   = $('#mobMenu');
+
+    hamburger.addEventListener('click', () => {
+      const open = hamburger.classList.toggle('open');
+      mobMenu.classList.toggle('open', open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+
+    $$('.mob-link').forEach(a => {
+      a.addEventListener('click', () => {
+        hamburger.classList.remove('open');
+        mobMenu.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    });
+
+    /* ── MENU TABS ───────────────────────────────────────── */
+    $('#menuTabs').addEventListener('click', (e) => {
+      const tab = e.target.closest('.m-tab');
+      if (!tab) return;
+      $$('.m-tab').forEach(t => t.classList.remove('active'));
+      $$('.m-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      const panel = $('#' + tab.dataset.tab);
+      panel.classList.add('active');
+      gsap.from(panel.querySelectorAll('.m-item'), {
+        x: -16, opacity: 0, duration: 0.5,
+        stagger: 0.05, ease: 'power2.out',
+        clearProps: 'all'
+      });
+    });
+
+    /* ── MARQUEES ────────────────────────────────────────── */
+    function runMarquee(el, pxPerTick) {
+      if (!el) return;
+      el.innerHTML += el.innerHTML;
+      const halfW = el.scrollWidth / 2;
+      let x = 0;
+      gsap.ticker.add(() => {
+        x -= pxPerTick;
+        if (x <= -halfW) x += halfW;
+        gsap.set(el, { x });
+      });
+    }
+
+    runMarquee($('#mainMq'),  0.65);
+    runMarquee($('#menuMq'),  0.50);
+
+    /* ── SCROLL ANIMATIONS ───────────────────────────────── */
+
+    // Section numbers
+    $$('.sec-num').forEach(el => {
+      gsap.from(el, {
+        x: -70, opacity: 0, duration: 1.3, ease: 'power3.out',
+        scrollTrigger: { trigger: el.closest('section') || el, start: 'top 82%' }
+      });
+    });
+
+    // Titles
+    $$('.sec-title').forEach(el => {
+      gsap.from(el, {
+        y: 40, opacity: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 86%' }
+      });
+    });
+
+    // Tags
+    $$('.sec-tag').forEach(el => {
+      gsap.from(el, {
+        y: 18, opacity: 0, duration: 0.8, ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 88%' }
+      });
+    });
+
+    // Gold rules
+    $$('.gold-rule, .gold-rule-c').forEach(el => {
+      gsap.from(el, {
+        scaleX: 0, transformOrigin: 'left center', duration: 0.9, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%' }
+      });
+    });
+
+    // About image
+    gsap.from('.about-img img', {
+      scale: 1.12, duration: 1.5, ease: 'power2.out',
+      scrollTrigger: { trigger: '#about', start: 'top 78%' }
+    });
+
+    // Stats
+    gsap.from('.stat', {
+      y: 28, opacity: 0, duration: 0.8, stagger: 0.14, ease: 'power2.out',
+      scrollTrigger: { trigger: '.about-stats', start: 'top 86%' }
+    });
+
+    // About CTA
+    gsap.from('#about .btn', {
+      y: 18, opacity: 0, duration: 0.8, ease: 'power2.out',
+      scrollTrigger: { trigger: '#about .btn', start: 'top 90%' }
+    });
+
+    // Menu items
+    gsap.from('.m-item', {
+      x: -16, opacity: 0, duration: 0.55, stagger: 0.055, ease: 'power2.out',
+      scrollTrigger: { trigger: '#menu', start: 'top 72%' }
+    });
+
+    // Gallery
+    gsap.from('.g-item', {
+      scale: 1.06, opacity: 0, duration: 1.1, stagger: 0.14, ease: 'power2.out',
+      scrollTrigger: { trigger: '#gallery', start: 'top 82%' }
+    });
+
+    // Why cards
+    gsap.from('.why-card', {
+      y: 50, opacity: 0, duration: 0.9, stagger: 0.2, ease: 'power3.out',
+      scrollTrigger: { trigger: '.why-grid', start: 'top 80%' }
+    });
+
+    // Why amber rules
+    $$('.why-rule').forEach(el => {
+      gsap.from(el, {
+        scaleX: 0, transformOrigin: 'left center', duration: 0.8, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%' }
+      });
+    });
+
+    // Testimonials
+    gsap.from('.testi-card', {
+      y: 40, opacity: 0, duration: 0.9, stagger: 0.15, ease: 'power3.out',
+      scrollTrigger: { trigger: '.testi-grid', start: 'top 80%' }
+    });
+
+    // Hours rows
+    gsap.from('.h-row', {
+      x: -28, opacity: 0, duration: 0.7, stagger: 0.1, ease: 'power2.out',
+      scrollTrigger: { trigger: '.hours-left', start: 'top 80%' }
+    });
+
+    // Hours right
+    gsap.from('.hours-right-overlay', {
+      opacity: 0, duration: 1, ease: 'power2.out',
+      scrollTrigger: { trigger: '.hours-right', start: 'top 80%' }
+    });
+
+    // Contact rows
+    gsap.from('.c-row', {
+      x: -28, opacity: 0, duration: 0.7, stagger: 0.12, ease: 'power2.out',
+      scrollTrigger: { trigger: '.contact-info', start: 'top 80%' }
+    });
+
+    // Contact form
+    gsap.from('.contact-form', {
+      x: 40, opacity: 0, duration: 1.1, ease: 'power3.out',
+      scrollTrigger: { trigger: '.contact-grid', start: 'top 76%' }
+    });
+
+    // Hop decors
+    $$('.hop-decor').forEach(el => {
+      gsap.from(el, {
+        scale: 0.6, opacity: 0, duration: 1.5, ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 85%' }
+      });
+    });
+
+  })();
+  </script>
+
+  <!-- ── TRACKING ───────────────────────────────────────────── -->
+  <script>fetch('http://localhost:3000/t/visit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({siteId:'wh-hospoda-u-kocoura-1781534796609'})}).catch(()=>{})</script>
+</body>
+</html>
